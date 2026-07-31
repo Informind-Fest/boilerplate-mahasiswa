@@ -1,0 +1,15 @@
+{
+  "threshold": 10,
+  "reporters": ["html", "console", "json"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.eslintrc.cjs",
+    "**/eslint.config.js",
+    "**/vite.config.ts"
+  ],
+  "absolute": true,
+  "gitignore": true,
+  "minLines": 5,
+  "minTokens": 40
+}
