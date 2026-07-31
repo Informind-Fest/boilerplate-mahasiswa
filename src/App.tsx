@@ -7,12 +7,12 @@ import { UserRoundPlus } from "lucide-react";
 
 const IF_SOCIAL_MEDIA = [
   {
-    social_name: "Instagram",
+    social_name: "Instagram HIMAIF",
     url: "https://www.instagram.com/himaifunibi/",
   },
   {
     social_name: "Email",
-    url: "mailto:himaifunibi@gmail.com?subject=Pertanyaan%20Lomba%20Informind%20Fest",
+    url: "mailto:himaiftechnosfera@gmail.com?subject=Pertanyaan%20Lomba%20Informind%20Fest",
   },
 ];
 
