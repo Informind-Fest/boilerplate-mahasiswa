@@ -1,0 +1,80 @@
+name: INFORMIND FEST Auto-Grader
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  grade:
+    name: Auto-Grading Assessment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Participant Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: 1. Test Production Build
+        id: build_step
+        run: |
+          npm run build
+          echo "BUILD_STATUS=PASS" >> $GITHUB_ENV
+
+      - name: 2. Test Linter Standard (ESLint)
+        if: always()
+        id: lint_step
+        run: |
+          npm run lint:grader
+          if [ -f eslint-report.json ]; then
+            ERR_COUNT=$(node -e "const r=require('./eslint-report.json'); console.log(r.reduce((acc, f) => acc + (f.errorCount || 0), 0))")
+            echo "LINT_ERRORS=$ERR_COUNT" >> $GITHUB_ENV
+          else
+            echo "LINT_ERRORS=0" >> $GITHUB_ENV
+          fi
+
+      - name: 3. Test Code Duplication (JSCPD)
+        if: always()
+        run: |
+          npx jscpd ./src --reporters console,json --output ./ || true
+
+      - name: 4. Generate Auto-Grader Job Summary Report
+        if: always()
+        run: |
+          echo "## 🏆 INFORMIND FEST VOL. II - Auto-Grader Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter Penilaian | Hasil Pengecekan | Status Kelolosan |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ env.BUILD_STATUS }}" == "PASS" ]; then
+            echo "| **Production Build** | 🟢 Build Lolos Tanpa Error | ✅ PASSED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| **Production Build** | 🔴 Build Gagal Kompilasi | ❌ FAILED |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ env.LINT_ERRORS }}" == "0" ]; then
+            echo "| **Zero Linter Error** | 🟢 0 Error Ditemukan | ✅ PASSED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| **Zero Linter Error** | 🔴 ${{ env.LINT_ERRORS }} Error Ditemukan | ❌ FAILED |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> *Laporan penilaian otomatis ini diproses secara real-time oleh GitHub Actions Auto-Grader Panitia INFORMIND FEST 2026.*" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Grading Reports Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-grader-reports
+          path: |
+            eslint-report.json
+            jscpd-report.json
