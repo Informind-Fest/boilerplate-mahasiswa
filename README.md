@@ -34,7 +34,18 @@ Jika panitia menemukan indikasi manipulasi pada file-file pengawas di atas, tim 
     - Dilarang mendeklarasikan variabel yang tidak digunakan.
     - Dilarang menggunakan tipe data any pada TypeScript.
     - Wajib mematuhi aturan dependency array pada React Hooks (useEffect, useCallback).
+    #### Yang ku tambah : 
+    - Dilarang menggunakan `var` (Wajib gunakan 'const' atau 'let').
+    - Wajib menggunakan `const` jika variabel tidak di-reassign (`prefer-const`).
+    - Wajib menggunakan *strict equality* (`===` dan `!==`).
+    - Dilarang membuat fungsi kosong
+    - Wajib mematuhi aturan dependency array pada React Hooks (`useEffect`, `useCallbackq`).
 3. **Anti-Duplikasi (Copy-Paste)**: Sistem akan mendeteksi penulisan UI atau logika yang diulang-ulang secara berlebihan tanpa menggunakan prinsip Reusable Component. Buatlah kode yang modular!
+
+### Pengujian Otomatis (Github Action)
+Repositori ini telah dilengkapi **Github Action Auto-Grader**.
+setiap kali Anda melakukan `git push` ke repositori ini, sitem akan otomatis menjalankan pengujian *Build*, *Linter*,
+dan *Plagialisme*, Anda dapat melihat status kelolosan secara *real-time* pada acara **Actions** di repositori GitHub tim Anda.
 
 ## Pengumpulan Final
 Pastikan Anda telah melakukan commit dan push seluruh kode final Anda ke repositori **GitHub Public** masing-masing sebelum batas waktu yang ditentukan. URL repositori tersebut akan diserahkan kepada panitia melalui formulir resmi.
