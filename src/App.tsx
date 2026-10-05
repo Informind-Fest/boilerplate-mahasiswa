@@ -1,94 +1,82 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
-import heroImg from "./assets/hero.png";
-import "./App.css";
-import { UserRoundPlus } from "lucide-react";
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useRef } from 'react';
+import { useMemo } from 'react';
+import { useCallback } from 'react';
+import { useReducer } from 'react';
+import { Fragment } from 'react';
+import { Suspense } from 'react';
+import { StrictMode } from 'react';
+import { createContext } from 'react';
 
-const IF_SOCIAL_MEDIA = [
-  {
-    social_name: "Instagram HIMAIF",
-    url: "https://www.instagram.com/himaifunibi/",
-  },
-  {
-    social_name: "Email",
-    url: "mailto:himaiftechnosfera@gmail.com?subject=Pertanyaan%20Lomba%20Informind%20Fest",
-  },
-];
+// Membuat context & reducer fiktif agar import di atas terpakai
+const MyContext = createContext("test");
+const myReducer = (state: number) => state + 1;
 
-function App() {
+export default function App() {
+  // 2. UJI HOOKS (>5 Hooks terpakai semua agar lolos build)
   const [count, setCount] = useState(0);
+  const [text, setText] = useState("a");
+  const myRef = useRef<HTMLDivElement>(null);
+  const memoVal = useMemo(() => count * 2, [count]);
+  const handleTick = useCallback(() => setCount(c => c + 1), []);
+  const [state, dispatch] = useReducer(myReducer, 0);
 
+  useEffect(() => {
+    // Memakai semua variabel agar TypeScript tidak error "unused variable"
+    if (myRef.current) {
+      myRef.current.title = text + state + memoVal;
+    }
+  }, [text, state, memoVal]);
+
+  // 3. UJI COMPLEXITY & NESTING
+  // Fungsi ini 100% valid TypeScript, tapi logikanya "Spaghetti" (Nesting > 3, Complexity > 5)
+  function checkDeepLogic(value: number): string {
+    let result = "Start";
+    
+    // Nesting 4 Level (Pelanggaran!)
+    if (value >= 0) {
+      if (value < 100) {
+        if (value % 2 === 0) {
+          if (value !== 50) {
+            result = "Nesting Level 4!";
+          }
+        }
+      }
+    }
+    
+    // Complexity Cyclomatic tinggi (Pelanggaran!)
+    if (value === 1) result += "1";
+    else if (value === 2) result += "2";
+    else if (value === 3) result += "3";
+    else if (value === 4) result += "4";
+    else if (value === 5) result += "5";
+    else if (value === 6) result += "6";
+    
+    return result;
+  }
+
+  // 4. UJI GOD COMPONENT (Function Size)
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Happy Coding!</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Follow for the other Competition in our Social Media</p>
-          <ul>
-            {IF_SOCIAL_MEDIA?.map((d) => (
-              <li key={d?.url}>
-                <a href={d.url} target="_blank">
-                  <UserRoundPlus />
-                  {d?.social_name || "Social Media"}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <StrictMode>
+      <MyContext.Provider value="test">
+        <Suspense fallback={<div>Loading...</div>}>
+          <Fragment>
+            <div ref={myRef}>
+              <button onClick={() => { handleTick(); dispatch(); setText("b"); }}>
+                Click {checkDeepLogic(count)}
+              </button>
+              
+              {/* 
+                WAJIB DILAKUKAN:
+                Copy-Paste tag <br/> di bawah ini BANYAK-BANYAK sampai total baris 
+                file App.tsx ini mencapai lebih dari 250 baris!
+              */}
+              <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+            </div>
+          </Fragment>
+        </Suspense>
+      </MyContext.Provider>
+    </StrictMode>
   );
 }
-
-export default App;
